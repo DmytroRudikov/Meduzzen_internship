@@ -9,3 +9,5 @@ databases~=0.7.0
 aioredis~=2.0.1
 redis~=4.5.1
 asyncpg~=0.27.0
+SQLAlchemy~=1.4.46
+pydantic~=1.10.5

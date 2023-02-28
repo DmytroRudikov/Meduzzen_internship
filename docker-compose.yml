@@ -30,7 +30,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB}
   pg_admin:
-    image: dpage/pgadmin14
+    image: dpage/pgadmin4
     env_file:
       - .env
     environment:

@@ -10,12 +10,12 @@ from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
-db_uri = f"postgresql+asyncpg://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
+db_uri = f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
 db = databases.Database(db_uri)
 r = redis.from_url(os.getenv("REDIS_URI"))
 
 engine = create_engine(db_uri)
-SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, expire_on_commit=False)
 Base = declarative_base()
 
 

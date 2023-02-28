@@ -19,18 +19,24 @@ app.add_middleware(
 
 
 @app.get("/")
-@app.on_event("startup")
 async def health_check():
-    await get_sql_db().connect()
-    get_redis_db()
     return {"status_code": 200,
             "detail": "ok",
             "result": "working"}
 
 
+@app.on_event("startup")
+async def connect_to_db():
+    db = get_sql_db()
+    await db.connect()
+    get_redis_db()
+
+
 @app.on_event("shutdown")
 async def disconnect_from_sql():
-    await get_sql_db().disconnect()
+    db = get_sql_db()
+    await db.disconnect()
+
 
 
 if __name__ == "__main__":

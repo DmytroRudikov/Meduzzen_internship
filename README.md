@@ -16,3 +16,11 @@
 ## to run tests from Docker, once container is running with the command above
 
     docker exec fastapipet python -m pytest
+
+## to make a migration
+
+    docker-compose run web alembic revision --autogenerate -m "First migration"
+
+## to run a migration
+
+    docker-compose run web alembic upgrade head

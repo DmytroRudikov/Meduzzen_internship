@@ -37,11 +37,12 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 
 # ---------------- added code here -------------------------#
-import models
+from app.schemas.models import Base
 #------------------------------------------------------------#
-
-
-target_metadata = None
+# ---------------- changed code here -------------------------#
+# here target_metadata was equal to None
+target_metadata = Base.metadata
+#------------------------------------------------------------#
 
 
 # other values from the config, defined by the needs of env.py,

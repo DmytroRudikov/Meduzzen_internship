@@ -24,7 +24,3 @@ class SignupRequest(User):
 
 class UserUpdate(User):
     pass
-
-
-class UsersList(User):
-    User: list[User]

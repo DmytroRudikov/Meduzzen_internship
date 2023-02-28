@@ -1,12 +1,21 @@
 from pydantic import BaseModel
 
 
-class User(BaseModel):
+class SigninRequest(BaseModel):
+    email: str
+    password: str
+
+
+class SignupRequest(SigninRequest):
+    first_name: str
+    last_name: str
+
+
+class UserBasic(BaseModel):
     id: int
     first_name: str
     last_name: str
-    email: str
-    password: str
+    status: str
     created_on: str
     updated_on: str
 
@@ -14,13 +23,13 @@ class User(BaseModel):
         orm_mode = True
 
 
-class SigninRequest(User):
-    pass
+class UserUpdate(UserBasic):
+    password: str
 
 
-class SignupRequest(User):
-    pass
+class UserFull(UserUpdate):
+    email: str
 
 
-class UserUpdate(User):
-    pass
+class User(UserBasic):
+    email: str

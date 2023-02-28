@@ -13,3 +13,5 @@ SQLAlchemy~=1.4.46
 pydantic~=1.10.5
 alembic~=1.9.4
 psycopg2~=2.9.5
+passlib~=1.7.4
+asyncio~=3.4.3

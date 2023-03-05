@@ -19,7 +19,7 @@ sys.path.append(BASE_DIR)
 config = context.config
 
 # ---------------- added code here -------------------------#
-from app.db.db_config import db_uri
+from app.core.db_config import db_uri
 
 # this will overwrite the ini-file sqlalchemy.url path
 # with the path given in the config of the main code
@@ -37,7 +37,7 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 
 # ---------------- added code here -------------------------#
-from app.schemas.models import Base
+from app.db.models import Base
 #------------------------------------------------------------#
 # ---------------- changed code here -------------------------#
 # here target_metadata was equal to None

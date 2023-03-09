@@ -5,8 +5,7 @@ import pytest_asyncio
 from typing import AsyncGenerator
 from starlette.testclient import TestClient
 from databases import Database
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.pool import NullPool
 from httpx import AsyncClient
 
@@ -17,7 +16,7 @@ from app.db.models import Base
 #import your test urls for db
 from app.core.db_config import db_url_test
 #import your get_db func
-from app.core.db_config import get_sql_db, get_session
+from app.core.db_config import get_sql_db
 
 test_db: Database = Database(db_url_test, force_rollback=True)
 
@@ -30,14 +29,6 @@ app.dependency_overrides[get_sql_db] = override_get_db
 
 
 engine_test = create_async_engine(db_url_test, poolclass=NullPool)
-async_session = sessionmaker(bind=engine_test, autocommit=False, autoflush=False, expire_on_commit=False, class_=AsyncSession)
-
-
-async def override_get_session():
-    async with async_session.begin() as session:
-        yield session
-
-app.dependency_overrides[get_session] = override_get_session
 
 
 @pytest.fixture(scope="session")
@@ -49,7 +40,7 @@ def event_loop():
 
 @pytest.fixture(scope="session")
 def test_app():
-    client = TestClient(app)
+    client = TestClient(router)
     yield client
 
 

@@ -13,22 +13,10 @@ from httpx import AsyncClient
 from app.main import app
 #import your metadata
 from app.db.models import Base
-#import your test urls for db
-from app.core.db_config import db_url_test
-#import your get_db func
-from app.core.db_config import get_sql_db
+#import your test database
+from app.core.db_config import database as test_db
 
-test_db: Database = Database(db_url_test, force_rollback=True)
-
-
-def override_get_db() -> Database:
-    return test_db
-
-
-app.dependency_overrides[get_sql_db] = override_get_db
-
-
-engine_test = create_async_engine(db_url_test, poolclass=NullPool)
+engine_test = create_async_engine("postgresql+asyncpg://postgres:passtest@localhost:5433/fastapipet", poolclass=NullPool)
 
 
 @pytest.fixture(scope="session")

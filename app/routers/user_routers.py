@@ -1,5 +1,5 @@
 from app.schemas import schemas
-from fastapi import Depends, Response, APIRouter
+from fastapi import APIRouter
 from app.utils.crud_user import UserCrud
 from typing import List
 from app.core.db_config import get_sql_db

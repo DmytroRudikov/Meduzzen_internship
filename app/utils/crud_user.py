@@ -36,16 +36,17 @@ class UserCrud:
     async def create_user(self, signup_form: schemas.SignupRequest) -> schemas.User:
         await self.user_exists(email=signup_form.email)
         hashed_password = context.hash(signup_form.password)
-        created_on = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        updated_on = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        form_dict = signup_form.dict()
-        form_dict["password"] = hashed_password
-        form_dict["created_on"] = created_on
-        form_dict["updated_on"] = updated_on
-        form_dict.pop("password_check")
-        query = insert(models.User).values(**form_dict)
+        payload = {
+            "password": hashed_password,
+            "created_on": str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+            "updated_on": str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+            "first_name": signup_form.first_name,
+            "last_name": signup_form.last_name,
+            "email": signup_form.email
+        }
+        query = insert(models.User).values(**payload)
         await self.db.execute(query=query)
-        new_user = await self.db.fetch_one(select(models.User).filter_by(email=form_dict.get("email")))
+        new_user = await self.db.fetch_one(select(models.User).filter_by(email=payload.get("email")))
         return new_user
 
     async def update_user_details(self, user: schemas.User, user_id: int, user_upd: schemas.UserUpdate):

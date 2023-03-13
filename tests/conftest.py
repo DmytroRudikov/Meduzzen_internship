@@ -28,7 +28,7 @@ def event_loop():
 
 @pytest.fixture(scope="session")
 def test_app():
-    client = TestClient(router)
+    client = TestClient(app)
     yield client
 
 

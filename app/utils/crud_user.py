@@ -1,4 +1,4 @@
-from schemas import schemas
+from schemas import user_schemas
 from db import models
 from core.db_config import get_sql_db
 from databases import Database
@@ -6,6 +6,7 @@ from passlib.context import CryptContext
 import datetime
 from fastapi import HTTPException, status, Depends
 from sqlalchemy import insert, select, delete, update
+from jose import jwt, JWTError
 
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -25,7 +26,7 @@ class UserCrud:
                 raise HTTPException(status_code=404, detail="User with this id does not exist")
             return user_exists
 
-    async def get_user(self, user_id: int) -> schemas.User:
+    async def get_user(self, user_id: int) -> user_schemas.User:
         user = await self.user_exists(user_id=user_id)
         return user
 
@@ -33,7 +34,7 @@ class UserCrud:
         result = await self.db.fetch_all(select(models.User))
         return result
 
-    async def create_user(self, signup_form: schemas.SignupRequest) -> schemas.User:
+    async def create_user(self, signup_form: user_schemas.SignupRequest) -> user_schemas.User:
         await self.user_exists(email=signup_form.email)
         hashed_password = context.hash(signup_form.password)
         created_on = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -48,7 +49,7 @@ class UserCrud:
         new_user = await self.db.fetch_one(select(models.User).filter_by(email=form_dict.get("email")))
         return new_user
 
-    async def update_user_details(self, user: schemas.User, user_id: int, user_upd: schemas.UserUpdate):
+    async def update_user_details(self, user: user_schemas.User, user_id: int, user_upd: user_schemas.UserUpdate):
         for key in user._mapping.keys():
             if key == "updated_on":
                 await self.db.execute(update(models.User).filter_by(id=user_id).values(
@@ -58,7 +59,7 @@ class UserCrud:
             else:
                 await self.db.execute(update(models.User).filter_by(id=user_id), values={key: user_upd.dict()[key]})
 
-    async def update_user(self, user_id: int, user_upd: schemas.UserUpdate) -> schemas.User:
+    async def update_user(self, user_id: int, user_upd: user_schemas.UserUpdate) -> user_schemas.User:
         user = await self.user_exists(user_id=user_id)
         await self.update_user_details(user=user, user_upd=user_upd, user_id=user_id)
         updated_user = await self.db.fetch_one(select(models.User).filter_by(id=user_id))

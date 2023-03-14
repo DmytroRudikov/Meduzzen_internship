@@ -1,16 +1,16 @@
 version: "3.10"
 services:
-#  web:
-#    build: .
-#    env_file:
-#      - .env
-#    ports:
-#      - ${APP_PORT}:${APP_PORT}
-#    volumes:
-#      - .:/code
-#    depends_on:
-#      - postgres
-#      - redis
+  web:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    volumes:
+      - .:/code
+    depends_on:
+      - postgres
+      - redis
   redis:
     image: "redis:alpine"
     restart: always

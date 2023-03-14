@@ -44,7 +44,7 @@ async def get_token_at_signin(login_form: user_schemas.SigninRequest):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-async def get_current_user(self, token: str = Depends(oauth_scheme)) -> user_schemas.User:
+async def get_current_user(token: str = Depends(oauth_scheme)) -> user_schemas.User:
     try:
         payload = jwt.decode(token=token, key=SECRET_KEY, algorithms=ALGORITHM)
         user_email = payload.get("sub")

@@ -7,6 +7,7 @@ import datetime
 from fastapi import HTTPException, status, Depends
 from sqlalchemy import insert, select, delete, update
 from jose import jwt, JWTError
+from typing import List
 
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -15,7 +16,7 @@ class UserCrud:
     def __init__(self, db: Database = Depends(get_sql_db)):
         self.db = db
 
-    async def user_exists(self, user_id=None, email=None):
+    async def user_exists(self, user_id=None, email=None) -> schemas.User:
         if user_id is None:
             user_exists = await self.db.fetch_one(select(models.User).filter_by(email=email))
             if user_exists:
@@ -30,7 +31,7 @@ class UserCrud:
         user = await self.user_exists(user_id=user_id)
         return user
 
-    async def get_all_users(self) -> list:
+    async def get_all_users(self) -> List[schemas.User]:
         result = await self.db.fetch_all(select(models.User))
         return result
 

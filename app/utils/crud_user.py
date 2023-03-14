@@ -6,6 +6,7 @@ from passlib.context import CryptContext
 import datetime
 from fastapi import HTTPException, status, Depends
 from sqlalchemy import insert, select, delete, update
+from typing import List
 
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -14,7 +15,7 @@ class UserCrud:
     def __init__(self, db: Database = Depends(get_sql_db)):
         self.db = db
 
-    async def user_exists(self, user_id=None, email=None):
+    async def user_exists(self, user_id=None, email=None) -> schemas.User:
         if user_id is None:
             user_exists = await self.db.fetch_one(select(models.User).filter_by(email=email))
             if user_exists:
@@ -29,7 +30,7 @@ class UserCrud:
         user = await self.user_exists(user_id=user_id)
         return user
 
-    async def get_all_users(self) -> list:
+    async def get_all_users(self) -> List[schemas.User]:
         result = await self.db.fetch_all(select(models.User))
         return result
 
@@ -50,14 +51,15 @@ class UserCrud:
         return new_user
 
     async def update_user_details(self, user: schemas.User, user_id: int, user_upd: schemas.UserUpdate):
+        updates = {}
         for key in user._mapping.keys():
             if key == "updated_on":
-                await self.db.execute(update(models.User).filter_by(id=user_id).values(
-                    updated_on=str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))))
+                updates["updated_on"] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             elif key not in user_upd.dict() or user_upd.dict()[key] is None:
                 continue
             else:
-                await self.db.execute(update(models.User).filter_by(id=user_id), values={key: user_upd.dict()[key]})
+                updates[key] = user_upd.dict()[key]
+        await self.db.execute(update(models.User).filter_by(id=user_id), values=updates)
 
     async def update_user(self, user_id: int, user_upd: schemas.UserUpdate) -> schemas.User:
         user = await self.user_exists(user_id=user_id)

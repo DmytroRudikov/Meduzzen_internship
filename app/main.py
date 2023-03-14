@@ -1,14 +1,18 @@
-from fastapi import FastAPI
+import sys
+import os
+sys.path.append(os.getcwd())
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from dotenv import load_dotenv
-import os
 import json
-from db.db_config import get_redis_db, get_sql_db
+from app.routers import user_routers, general_routers
 
 load_dotenv()
 
 app = FastAPI()
+app.include_router(general_routers.router)
+app.include_router(user_routers.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=json.loads(os.getenv("ORIGINS")) if os.getenv("ORIGINS") is not None else "*",
@@ -19,18 +23,10 @@ app.add_middleware(
 
 
 @app.get("/")
-@app.on_event("startup")
 async def health_check():
-    await get_sql_db().connect()
-    get_redis_db()
     return {"status_code": 200,
             "detail": "ok",
             "result": "working"}
-
-
-@app.on_event("shutdown")
-async def disconnect_from_sql():
-    await get_sql_db().disconnect()
 
 
 if __name__ == "__main__":

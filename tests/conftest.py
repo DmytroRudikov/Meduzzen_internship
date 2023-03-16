@@ -16,7 +16,7 @@ from app.db.models import Base
 #import your test database
 from app.core.db_config import database as test_db
 
-engine_test = create_async_engine("postgresql+asyncpg://postgres:passtest@localhost:5433/fastapipet", poolclass=NullPool)
+engine_test = create_async_engine(str(test_db.url), poolclass=NullPool)
 
 
 @pytest.fixture(scope="session")

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from core.db_config import get_redis_db, get_sql_db
+from app.core.db_config import get_redis_db, get_sql_db
 
 router = APIRouter()
 

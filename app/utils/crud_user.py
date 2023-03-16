@@ -16,7 +16,7 @@ class UserCrud:
     def __init__(self, db: Database = Depends(get_sql_db)):
         self.db = db
 
-    async def user_exists(self, user_id=None, email=None) -> schemas.User:
+    async def user_exists(self, user_id=None, email=None) -> user_schemas.User:
         if user_id is None:
             user_exists = await self.db.fetch_one(select(models.User).filter_by(email=email))
             if user_exists:
@@ -28,10 +28,20 @@ class UserCrud:
             return user_exists
 
     async def get_user(self, user_id: int) -> user_schemas.User:
+        print("@@@@@@@@@@@@@")
+        print(self.db.connection())
+        print(self.db.is_connected)
+        print(self.db.url)
+        print("@@@@@@@@@@@@@")
         user = await self.user_exists(user_id=user_id)
         return user
 
-    async def get_all_users(self) -> List[schemas.User]:
+    async def get_all_users(self) -> List[user_schemas.User]:
+        print("@@@@@@@@@@@@@")
+        print(self.db.connection())
+        print(self.db.is_connected)
+        print(self.db.url)
+        print("@@@@@@@@@@@@@")
         result = await self.db.fetch_all(select(models.User))
         return result
 

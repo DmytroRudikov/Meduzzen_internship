@@ -27,21 +27,20 @@ class UserCrud:
                 raise HTTPException(status_code=404, detail="User with this id does not exist")
             return user_exists
 
-    async def get_user(self, user_id: int) -> user_schemas.User:
-        # print("@@@@@@@@@@@@@")
-        # print(self.db.connection())
-        # print(self.db.is_connected)
-        # print(self.db.url)
-        # print("@@@@@@@@@@@@@")
-        user = await self.user_exists(user_id=user_id)
+    async def user_exists_for_auth(self, email: str) -> user_schemas.User:
+        user_exists = await self.db.fetch_one(select(models.User).filter_by(email=email))
+        if not user_exists:
+            raise HTTPException(status_code=401, detail="Incorrect username or password")
+        return user_exists
+
+    async def get_user(self, user_id: int, email=None) -> user_schemas.User:
+        if email is None:
+            user = await self.user_exists(user_id=user_id)
+        else:
+            user = await self.user_exists_for_auth(email=email)
         return user
 
     async def get_all_users(self) -> List[user_schemas.User]:
-        # print("@@@@@@@@@@@@@")
-        # print(self.db.connection())
-        # print(self.db.is_connected)
-        # print(self.db.url)
-        # print("@@@@@@@@@@@@@")
         result = await self.db.fetch_all(select(models.User))
         return result
 

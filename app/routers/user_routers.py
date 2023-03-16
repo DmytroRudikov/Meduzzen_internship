@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.getcwd())
+
 from databases import Database
 from app.schemas import user_schemas
 from fastapi import APIRouter, Depends

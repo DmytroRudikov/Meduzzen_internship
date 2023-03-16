@@ -47,7 +47,7 @@ target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    """Run alembic in 'offline' mode.
+    """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
     and not an Engine, though an Engine is acceptable
@@ -96,7 +96,7 @@ async def run_async_migrations() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run alembic in 'online' mode."""
+    """Run migrations in 'online' mode."""
 
     asyncio.run(run_async_migrations())
 

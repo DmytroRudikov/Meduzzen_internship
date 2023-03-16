@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.getcwd())
+
 from app.schemas import token_schemas, user_schemas
 from fastapi import APIRouter, Depends
 from app.utils import authorisation

@@ -5,9 +5,9 @@ sys.path.append(os.getcwd())
 from databases import Database
 from app.schemas import user_schemas
 from fastapi import APIRouter, Depends
-from app.utils.authorisation import Auth
+from app.core.authorisation import Auth
 from typing import List
-from app.utils.crud_user import UserCrud
+from app.services.crud_user import UserCrud
 from app.core.db_config import get_sql_db
 
 router = APIRouter()

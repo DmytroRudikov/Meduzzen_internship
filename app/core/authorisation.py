@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from schemas import token_schemas, user_schemas
-from utils.crud_user import context, UserCrud
+from services.crud_user import context, UserCrud
 import datetime
 import os
 from dotenv import load_dotenv

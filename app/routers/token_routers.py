@@ -4,8 +4,8 @@ sys.path.append(os.getcwd())
 
 from app.schemas import token_schemas, user_schemas
 from fastapi import APIRouter, Depends
-from app.utils.authorisation import Auth
-from app.utils.crud_user import UserCrud
+from app.core.authorisation import Auth
+from app.services.crud_user import UserCrud
 from app.core.db_config import get_sql_db
 from databases import Database
 

@@ -4,7 +4,7 @@ from core.db_config import get_sql_db
 from databases import Database
 from passlib.context import CryptContext
 import datetime
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status
 from sqlalchemy import insert, select, delete, update
 from jose import jwt, JWTError
 from typing import List
@@ -13,7 +13,7 @@ context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class UserCrud:
-    def __init__(self, db: Database = Depends(get_sql_db)):
+    def __init__(self, db: Database):
         self.db = db
 
     async def user_exists(self, user_id=None, email=None) -> user_schemas.User:
@@ -28,20 +28,20 @@ class UserCrud:
             return user_exists
 
     async def get_user(self, user_id: int) -> user_schemas.User:
-        print("@@@@@@@@@@@@@")
-        print(self.db.connection())
-        print(self.db.is_connected)
-        print(self.db.url)
-        print("@@@@@@@@@@@@@")
+        # print("@@@@@@@@@@@@@")
+        # print(self.db.connection())
+        # print(self.db.is_connected)
+        # print(self.db.url)
+        # print("@@@@@@@@@@@@@")
         user = await self.user_exists(user_id=user_id)
         return user
 
     async def get_all_users(self) -> List[user_schemas.User]:
-        print("@@@@@@@@@@@@@")
-        print(self.db.connection())
-        print(self.db.is_connected)
-        print(self.db.url)
-        print("@@@@@@@@@@@@@")
+        # print("@@@@@@@@@@@@@")
+        # print(self.db.connection())
+        # print(self.db.is_connected)
+        # print(self.db.url)
+        # print("@@@@@@@@@@@@@")
         result = await self.db.fetch_all(select(models.User))
         return result
 

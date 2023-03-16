@@ -16,7 +16,7 @@ from app.db.models import Base
 #import your test database
 from app.core.db_config import database as test_db
 
-engine_test = create_async_engine(str(test_db.url), poolclass=NullPool)
+engine_test = create_async_engine("postgresql+asyncpg://postgres:passtest@localhost:5433/fastapipet", poolclass=NullPool)
 
 
 @pytest.fixture(scope="session")
@@ -35,18 +35,10 @@ def test_app():
 @pytest_asyncio.fixture(autouse=True, scope='session')
 async def prepare_database():
     await test_db.connect()
-    print("@@@@@1111@@@@")
-    print(test_db.is_connected)
-    print(test_db.connection())
-    print(test_db.url)
     async with engine_test.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
-    print("@@@@@22222@@@@")
-    print(test_db.connection())
     await test_db.disconnect()
-    print(test_db.is_connected)
-    print(test_db.url)
     async with engine_test.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 

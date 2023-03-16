@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from schemas import token_schemas, user_schemas
-from core.classes_config import crud_user
+# from core.classes_config import crud_user
 from utils.crud_user import context
 import datetime
 import os
@@ -56,5 +56,5 @@ async def get_current_user(token: str = Depends(oauth_scheme)) -> user_schemas.U
     except JWTError:
         raise credentials_exception
     else:
-        user = await user_exists(email=user_email)
+        user = await crud_user.user_exists(email=user_email)
         return user

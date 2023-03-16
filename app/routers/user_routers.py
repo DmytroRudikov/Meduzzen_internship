@@ -19,6 +19,10 @@ async def get_current_user(current_user: user_schemas.User = Depends(get_current
 
 @router.get("/users", response_model=List[user_schemas.User])
 async def get_all_users() -> List[user_schemas.User]:
+    print("@@@ user routers @@@")
+    print(crud_user.db.connection())
+    print(crud_user.db.is_connected)
+    print(crud_user.db.url)
     return await crud_user.get_all_users()
 
 

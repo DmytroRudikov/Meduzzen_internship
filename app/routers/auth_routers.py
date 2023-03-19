@@ -12,7 +12,7 @@ auth = Auth()
 
 @router.post("/auth/login", response_model=token_schemas.Token)
 async def signin_and_get_token(login_form: user_schemas.SigninRequest) -> token_schemas.Token:
-    return await auth.get_token_at_signin(login_form=login_form)
+    return await auth.signin(login_form=login_form)
 
 
 @router.get("/auth/me", response_model=user_schemas.User)

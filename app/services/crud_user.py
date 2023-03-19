@@ -1,3 +1,5 @@
+import os
+
 from schemas import user_schemas
 from db import models
 from core.db_config import get_sql_db
@@ -59,6 +61,24 @@ class UserCrud:
         await self.db.execute(query=query)
         new_user = await self.db.fetch_one(select(models.User).filter_by(email=payload.get("email")))
         return new_user
+
+    async def create_user_auth0_if_not_exists(self, token: str) -> user_schemas.User:
+        payload = jwt.decode(token=token, key=os.getenv("SECRET_KEY"), algorithms=os.getenv("ALGORITHM"))
+        email = payload.get("user_email")
+        user = await self.db.fetch_one(select(models.User).filter_by(email=email))
+        if not user:
+            user_details = {
+                "password": token,
+                "created_on": str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                "updated_on": str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                "first_name": token,
+                "last_name": token,
+                "email": email,
+            }
+            query = insert(models.User).values(**user_details)
+            await self.db.execute(query=query)
+            user = await self.db.fetch_one(select(models.User).filter_by(email=user_details.get("email")))
+        return user
 
     async def update_user_details(self, user: user_schemas.User, user_id: int, user_upd: user_schemas.UserUpdate):
         updates = {}

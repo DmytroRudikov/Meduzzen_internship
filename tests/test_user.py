@@ -220,3 +220,12 @@ async def test_bad_auth_me(ac: AsyncClient):
     }
     response = await ac.get("/auth/me", headers=headers)
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_auth_me_with_real_auth0_token(ac: AsyncClient):
+    headers = {
+        "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjE3TUloemE0SzVuM3kzLUZMd3JPbCJ9.eyJ1c2VyX2VtYWlsIjoiZG15dHJvLnJ1ZGlrb3ZAZ21haWwuY29tIiwiaXNzIjoiaHR0cHM6Ly9kZXYtOGtjNmw3YXhqcmFybm42YS51cy5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTAxNDM2OTA3NTMzNTYwODUwNjYiLCJhdWQiOlsiaHR0cHM6Ly9mYXN0YXBpcGV0LmNvbS8iLCJodHRwczovL2Rldi04a2M2bDdheGpyYXJubjZhLnVzLmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE2NzkyNjEzMzEsImV4cCI6MTY3OTM0NzczMSwiYXpwIjoiODVJQnhsOEJmUzNvOU1UMzNkOG1MSUFsUUdDR2ZOVFMiLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIn0.jVX2WIkQF18ufNqarz6dHbzM6bzMQKdfiIhgJ7VF47xSG1FF98t9UysGr8sZf0qNkwX7UsG27GotOyahGu4DtEdewaVUwKW77XCA805WiOIN4dKlj7jPQHcNaCkPpwOtLEF_9RcTLbH3hHDrfxebSTx09rndoN-GpVSG5T0oGeOm8Bv09Ea1gi1nEi_nylclpKQY5nVyKdLuvC7fx3VdEVhFN4koA7FrhYg8LgNBQRjWKR3K82N6ZdU40yiCn0LAegVBDKE1LkPMrn0Kcy2Vg00zzh0dSxgiyVbkUzM4iRq53rhCX98ZdQe8CIlZZaH8YYWrT-vwwAdFgttMUWP9Sw"
+    }
+    response = await ac.get("/auth/me", headers=headers)
+    assert response.status_code == 200

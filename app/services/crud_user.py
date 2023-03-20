@@ -80,7 +80,8 @@ class UserCrud:
             user = await self.db.fetch_one(select(models.User).filter_by(email=user_details.get("email")))
         return user
 
-    async def update_user_details(self, user: user_schemas.User, user_id: int, user_upd: user_schemas.UserUpdate):
+    @staticmethod
+    async def update_user_details(user: user_schemas.User, user_upd: user_schemas.UserUpdate) -> user_schemas.User:
         updates = {}
         for key in user._mapping.keys():
             if key == "updated_on":
@@ -89,14 +90,15 @@ class UserCrud:
                 continue
             else:
                 updates[key] = user_upd.dict()[key]
-        await self.db.execute(update(models.User).filter_by(id=user_id), values=updates)
+        return updates
 
     async def update_user(self, user_id: int, user_upd: user_schemas.UserUpdate) -> user_schemas.User:
         user = await self.user_exists(user_id=user_id)
-        await self.update_user_details(user=user, user_upd=user_upd, user_id=user_id)
+        user_update_dict = await self.update_user_details(user=user, user_upd=user_upd)
+        await self.db.execute(update(models.User).filter_by(id=user_id), values=user_update_dict)
         updated_user = await self.db.fetch_one(select(models.User).filter_by(id=user_id))
         return updated_user
 
-    async def delete_user(self, user_id: int):
+    async def delete_user(self, user_id: int) -> status.HTTP_200_OK:
         await self.db.execute(delete(models.User).filter_by(id=user_id))
         return status.HTTP_200_OK

@@ -180,3 +180,43 @@ async def test_get_users_list_after_delete(ac: AsyncClient):
     response = await ac.get("/users")
     assert response.status_code == 200
     assert len(response.json()) == 2
+
+
+@pytest.mark.asyncio
+async def test_bad_login_try(ac: AsyncClient):
+    payload = {
+        "email": "test2@test.com",
+        "password": "tess",
+    }
+    response = await ac.post("/auth/login", json=payload)
+    assert response.status_code == 401
+    assert response.json().get('detail') == 'Incorrect username or password'
+
+
+@pytest.mark.asyncio
+async def test_login_try(ac: AsyncClient, login_user):
+    response = await login_user("test2@test.com", "testt")
+    assert response.status_code == 200
+    assert response.json().get('token_type') == 'Bearer'
+
+
+@pytest.mark.asyncio
+async def test_auth_me(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}"
+    }
+    response = await ac.get("/auth/me", headers=headers)
+    assert response.status_code == 200
+    assert response.json().get('first_name') == "test"
+    assert response.json().get('last_name') == "2"
+    assert response.json().get('email') == "test2@test.com"
+    assert response.json().get('id') == 2
+
+
+@pytest.mark.asyncio
+async def test_bad_auth_me(ac: AsyncClient):
+    headers = {
+        "Authorization": f"Bearer sdffaf.afdsg.rtrwtrete",
+    }
+    response = await ac.get("/auth/me", headers=headers)
+    assert response.status_code == 401

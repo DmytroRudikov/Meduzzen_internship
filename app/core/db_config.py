@@ -21,14 +21,13 @@ load_dotenv()
 
 r = redis.from_url(os.getenv("REDIS_URI"))
 
-
-if bool(os.getenv("TESTING")):
+if settings.TESTING:
     database = databases.Database(f"postgresql+asyncpg://postgres:passtest@localhost:5433/fastapipet", force_rollback=True)
 else:
     database = databases.Database(f"postgresql+asyncpg://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}")
 
 
-def get_sql_db():
+def get_sql_db() -> databases.Database:
     return database
 
 

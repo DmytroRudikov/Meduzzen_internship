@@ -1,33 +1,42 @@
-from app.schemas import schemas
-from fastapi import APIRouter
-from app.utils.crud_user import UserCrud
+import sys
+import os
+sys.path.append(os.getcwd())
+
+from databases import Database
+from app.schemas import user_schemas
+from fastapi import APIRouter, Depends
 from typing import List
+from app.services.crud_user import UserCrud
 from app.core.db_config import get_sql_db
 
 router = APIRouter()
-crud_user = UserCrud(get_sql_db())
 
 
-@router.get("/user", response_model=schemas.User)
-async def get_user(user_id: int) -> schemas.User:
+@router.get("/user", response_model=user_schemas.User)
+async def get_user(user_id: int, db: Database = Depends(get_sql_db)) -> user_schemas.User:
+    crud_user = UserCrud(db=db)
     return await crud_user.get_user(user_id=user_id)
 
 
-@router.get("/users", response_model=List[schemas.User])
-async def get_all_users() -> List[schemas.User]:
+@router.get("/users", response_model=List[user_schemas.User])
+async def get_all_users(db: Database = Depends(get_sql_db)) -> List[user_schemas.User]:
+    crud_user = UserCrud(db=db)
     return await crud_user.get_all_users()
 
 
-@router.post("/user", response_model=schemas.User)
-async def create_user(signup_form: schemas.SignupRequest) -> schemas.User:
+@router.post("/user", response_model=user_schemas.User)
+async def create_user(signup_form: user_schemas.SignupRequest, db: Database = Depends(get_sql_db)) -> user_schemas.User:
+    crud_user = UserCrud(db=db)
     return await crud_user.create_user(signup_form=signup_form)
 
 
-@router.put("/user", response_model=schemas.User)
-async def update_user(user_upd: schemas.UserUpdate, user_id: int) -> schemas.User:
+@router.put("/user", response_model=user_schemas.User)
+async def update_user(user_upd: user_schemas.UserUpdate, user_id: int, db: Database = Depends(get_sql_db)) -> user_schemas.User:
+    crud_user = UserCrud(db=db)
     return await crud_user.update_user(user_id=user_id, user_upd=user_upd)
 
 
 @router.delete("/user", status_code=200)
-async def delete_user(user_id: int):
+async def delete_user(user_id: int, db: Database = Depends(get_sql_db)):
+    crud_user = UserCrud(db=db)
     return await crud_user.delete_user(user_id=user_id)

@@ -42,7 +42,6 @@ class User(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    id: int | None = None
     first_name: str | None = None
     last_name: str | None = None
     status: str | None = None

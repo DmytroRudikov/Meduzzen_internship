@@ -16,8 +16,8 @@ load_dotenv()
 
 class Auth:
 
-    oauth_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
-    token_oauth_scheme = HTTPBearer()
+    oauth_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
+    token_oauth_scheme = HTTPBearer(auto_error=False)
 
     def __init__(self):
         self.credentials_exception = HTTPException(status_code=401,
@@ -57,6 +57,8 @@ class Auth:
         crud_user = UserCrud(db=get_sql_db())
         try:
             payload = jwt.decode(token=token, key=self.SECRET_KEY, algorithms=self.ALGORITHM)
+        except AttributeError:
+            raise HTTPException(status_code=403, detail="No token provided, access forbidden")
         except JWTError:
             payload = VerifyToken(token=token_auth0.credentials).verify_token()
         user_email = payload.get("user_email")
@@ -91,7 +93,7 @@ class VerifyToken:
             signing_key = self.jwks_client.get_signing_key_from_jwt(token=self.token).key
         except PyJWKClientError:
             raise self.credentials_exception
-        except DecodeError as error:
+        except DecodeError:
             raise self.credentials_exception
         else:
             payload = jwt.decode(

@@ -220,3 +220,118 @@ async def test_bad_auth_me(ac: AsyncClient):
     }
     response = await ac.get("/auth/me", headers=headers)
     assert response.status_code == 401
+
+
+# =====================================================
+
+
+@pytest.mark.asyncio
+async def test_get_users_list_auth(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}"
+    }
+    response = await ac.get("/users", headers=headers)
+    assert response.status_code == 200
+    assert len(response.json().get("users")) == 3
+
+
+@pytest.mark.asyncio
+async def test_get_users_list_unauth(ac: AsyncClient):
+    response = await ac.get("/users")
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_get_user_by_id_auth(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}"
+    }
+    response = await ac.get("/user?user_id=1", headers=headers)
+    assert response.status_code == 200
+    assert response.json().get("id") == 1
+    assert response.json().get("email") == 'test1@test.com'
+    assert response.json().get("first_name") == 'test'
+    assert response.json().get('last_name') == "1"
+
+
+async def test_get_user_by_id_unauth(ac: AsyncClient):
+    response = await ac.get("/user?user_id=1")
+    assert response.status_code == 403
+
+
+async def test_bad_get_user_by_id_auth(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}"
+    }
+    response = await ac.get("/user?user_id=4", headers=headers)
+    assert response.status_code == 404
+
+
+async def test_update_user_one_bad(ac: AsyncClient, users_tokens):
+    payload = {
+      "first_name": "test1",
+      "last_name": "NEW"
+    }
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}"
+    }
+    response = await ac.put("/user?user_id=1", json=payload, headers=headers)
+    assert response.status_code == 403
+    assert response.json().get("detail") == "It's not your account"
+
+
+async def test_update_user_one_good(ac: AsyncClient, users_tokens):
+    payload = {
+      "first_name": "test2",
+      "last_name": "NEW"
+    }
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}"
+    }
+    response = await ac.put("/user?user_id=2", json=payload, headers=headers)
+    assert response.status_code == 200
+    assert response.json().get("id") == 2
+
+
+async def test_get_user_by_id_updates_auth(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}"
+    }
+    response = await ac.get("/user?user_id=2", headers=headers)
+    assert response.status_code == 200
+    assert response.json().get("id") == 2
+    assert response.json().get("email") == 'test2@test.com'
+    assert response.json().get("last_name") == 'test2'
+    assert response.json().get("first_name") == 'NEW'
+
+
+async def test_delete_user_one_bad(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}"
+    }
+    response = await ac.delete("/user?user_id=1", headers=headers)
+    assert response.status_code == 403
+    assert response.json().get("detail") == "It's not your account"
+
+
+async def test_delete_user_one_good(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}"
+    }
+    response = await ac.delete("/user?user_id=2", headers=headers)
+    assert response.status_code == 200
+
+
+async def test_login_user_one(ac: AsyncClient, login_user):
+    response = await login_user("test1@test.com", "testt")
+    assert response.status_code == 200
+    assert response.json().get('token_type') == 'Bearer'
+
+
+async def test_get_users_list_after_delete_auth(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test1@test.com']}"
+    }
+    response = await ac.get("/users", headers=headers)
+    assert response.status_code == 200
+    assert len(response.json().get("users")) == 2

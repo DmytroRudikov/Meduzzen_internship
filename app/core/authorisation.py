@@ -13,11 +13,35 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+oauth_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
+token_oauth_scheme = HTTPBearer(auto_error=False)
+
+
+async def get_current_user(token: str = Depends(oauth_scheme),
+                           token_auth0: str = Depends(token_oauth_scheme)) -> user_schemas.User:
+    crud_user = UserCrud(db=get_sql_db())
+    auth = Auth()
+    try:
+        payload = jwt.decode(token=token, key=auth.SECRET_KEY, algorithms=auth.ALGORITHM)
+    except AttributeError:
+        raise HTTPException(status_code=403, detail="No token provided, access forbidden")
+    except JWTError:
+        payload = VerifyToken(token=token_auth0.credentials).verify_token()
+    user_email = payload.get("user_email")
+    if user_email is None:
+        raise auth.credentials_exception
+    else:
+        try:
+            payload.pop("aud")
+        except KeyError:
+            pass
+        expires_delta = datetime.timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = auth.create_token(data=payload, expires_delta=expires_delta)
+        user = await crud_user.create_user_auth0_if_not_exists(token=access_token)
+        return user
+
 
 class Auth:
-
-    oauth_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
-    token_oauth_scheme = HTTPBearer(auto_error=False)
 
     def __init__(self):
         self.credentials_exception = HTTPException(status_code=401,
@@ -53,26 +77,26 @@ class Auth:
         token = token_schemas.Token(access_token=access_token, token_type="Bearer")
         return token
 
-    async def get_current_user(self, token: str = Depends(oauth_scheme), token_auth0: str = Depends(token_oauth_scheme)) -> user_schemas.User:
-        crud_user = UserCrud(db=get_sql_db())
-        try:
-            payload = jwt.decode(token=token, key=self.SECRET_KEY, algorithms=self.ALGORITHM)
-        except AttributeError:
-            raise HTTPException(status_code=403, detail="No token provided, access forbidden")
-        except JWTError:
-            payload = VerifyToken(token=token_auth0.credentials).verify_token()
-        user_email = payload.get("user_email")
-        if user_email is None:
-            raise self.credentials_exception
-        else:
-            try:
-                payload.pop("aud")
-            except KeyError:
-                pass
-            expires_delta = datetime.timedelta(minutes=self.ACCESS_TOKEN_EXPIRE_MINUTES)
-            access_token = self.create_token(data=payload, expires_delta=expires_delta)
-            user = crud_user.create_user_auth0_if_not_exists(token=access_token)
-            return user
+    # async def get_current_user(self, token: str = Depends(oauth_scheme), token_auth0: str = Depends(token_oauth_scheme)) -> user_schemas.User:
+    #     crud_user = UserCrud(db=get_sql_db())
+    #     try:
+    #         payload = jwt.decode(token=token, key=self.SECRET_KEY, algorithms=self.ALGORITHM)
+    #     except AttributeError:
+    #         raise HTTPException(status_code=403, detail="No token provided, access forbidden")
+    #     except JWTError:
+    #         payload = VerifyToken(token=token_auth0.credentials).verify_token()
+    #     user_email = payload.get("user_email")
+    #     if user_email is None:
+    #         raise self.credentials_exception
+    #     else:
+    #         try:
+    #             payload.pop("aud")
+    #         except KeyError:
+    #             pass
+    #         expires_delta = datetime.timedelta(minutes=self.ACCESS_TOKEN_EXPIRE_MINUTES)
+    #         access_token = self.create_token(data=payload, expires_delta=expires_delta)
+    #         user = crud_user.create_user_auth0_if_not_exists(token=access_token)
+    #         return user
 
 
 class VerifyToken:
@@ -104,4 +128,3 @@ class VerifyToken:
                 issuer=self.issuer,
             )
             return payload
-

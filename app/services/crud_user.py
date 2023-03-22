@@ -1,13 +1,12 @@
 import os
 from schemas import user_schemas
 from db import models
-from core.db_config import get_sql_db
 from databases import Database
 from passlib.context import CryptContext
 import datetime
 from fastapi import HTTPException, status
 from sqlalchemy import insert, select, delete, update
-from jose import jwt, JWTError
+from jose import jwt
 from typing import List
 
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")

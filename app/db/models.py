@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
@@ -27,5 +27,6 @@ class Company(Base):
     company_description = Column(String)
     owner_relationship = relationship("User", back_populates="company_relationship")
     company_owner_id = Column(Integer, ForeignKey("users.id"))
+    company_visible = Column(Boolean)
     created_on = Column(String, nullable=False)
     updated_on = Column(String, nullable=False)

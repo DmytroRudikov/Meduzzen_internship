@@ -5,11 +5,13 @@ from fastapi import HTTPException
 class CompanyUpdate(BaseModel):
     company_name: str | None = None
     company_description: str | None = None
+    company_visible: bool | None = None
 
 
 class CreateCompany(BaseModel):
     company_name: str
     company_description: str | None = None
+    company_visible: bool | None = None
 
     @validator("company_name")
     def name_not_empty(cls, company_name):

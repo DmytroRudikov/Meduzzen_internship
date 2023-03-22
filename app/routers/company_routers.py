@@ -19,13 +19,13 @@ auth = Auth()
 @router.get("/company/{company_id}", response_model=company_schemas.Company)
 async def get_company(company_id: int, db: Database = Depends(get_sql_db), user: user_schemas.User = Depends(get_current_user)) -> company_schemas.Company:
     crud_company = CompanyCrud(db=db)
-    return await crud_company.get_company(company_id=company_id)
+    return await crud_company.get_company(company_id=company_id, user_id=user.id)
 
 
 @router.get("/companies", response_model=Page[company_schemas.Company])
 async def get_all_companies(db: Database = Depends(get_sql_db), user: user_schemas.User = Depends(get_current_user)) -> List[company_schemas.Company]:
     crud_company = CompanyCrud(db=db)
-    companies = await crud_company.get_all_companies()
+    companies = await crud_company.get_all_companies(user_id=user.id)
     return paginate(companies)
 
 
@@ -38,7 +38,7 @@ async def create_company(create_company_form: company_schemas.CreateCompany, db:
 @router.put("/company/{company_id}", response_model=company_schemas.Company)
 async def update_company(company_upd: company_schemas.CompanyUpdate, company_id: int, db: Database = Depends(get_sql_db), user: user_schemas.User = Depends(get_current_user)) -> company_schemas.Company:
     crud_company = CompanyCrud(db=db)
-    comp_to_upd = await crud_company.get_company(company_id=company_id)
+    comp_to_upd = await crud_company.get_company(company_id=company_id, user_id=user.id)
     owner_id = comp_to_upd.company_owner_id
     if user.id != owner_id:
         raise HTTPException(status_code=403, detail="It's not your company")
@@ -48,7 +48,7 @@ async def update_company(company_upd: company_schemas.CompanyUpdate, company_id:
 @router.delete("/company/{company_id}", status_code=200)
 async def delete_company(company_id: int, db: Database = Depends(get_sql_db), user: user_schemas.User = Depends(get_current_user)):
     crud_company = CompanyCrud(db=db)
-    comp_to_delete = await crud_company.get_company(company_id=company_id)
+    comp_to_delete = await crud_company.get_company(company_id=company_id, user_id=user.id)
     owner_id = comp_to_delete.company_owner_id
     if user.id != owner_id:
         raise HTTPException(status_code=403, detail="It's not your company")

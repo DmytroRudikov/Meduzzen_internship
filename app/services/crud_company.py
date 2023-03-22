@@ -24,13 +24,30 @@ class CompanyCrud:
                 raise HTTPException(status_code=404, detail="Company with this id does not exist")
             return company_exists
 
-    async def get_company(self, company_id: int) -> company_schemas.Company:
-        company = await self.company_exists(company_id=company_id)
-        return company
+    async def visibility_check(self, companies: list, user_id: int):
+        companies_to_return = []
+        crud_user = UserCrud(db=self.db)
+        for comp in companies:
+            if comp.company_visible is None or comp.company_visible:
+                companies_to_return.append(comp)
+            else:
+                user = await crud_user.get_user(user_id=user_id)
+                if user.id == comp.company_owner_id:
+                    companies_to_return.append(comp)
+                else:
+                    if len(companies) == 1:
+                        raise HTTPException(status_code=403, detail="The company is invisible")
+        return companies_to_return
 
-    async def get_all_companies(self) -> List[company_schemas.Company]:
+    async def get_company(self, company_id: int, user_id: int) -> company_schemas.Company:
+        company = await self.company_exists(company_id=company_id)
+        to_return_if_visible = await self.visibility_check([company], user_id=user_id)
+        return to_return_if_visible[0]
+
+    async def get_all_companies(self, user_id: int) -> List[company_schemas.Company]:
         result = await self.db.fetch_all(select(models.Company))
-        return result
+        to_return_if_visible = await self.visibility_check(result, user_id=user_id)
+        return to_return_if_visible
 
     async def create_company(self, user_id: int, create_company_form: company_schemas.CreateCompany) -> company_schemas.Company:
         await self.company_exists(company_name=create_company_form.company_name)
@@ -39,6 +56,7 @@ class CompanyCrud:
             "updated_on": str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
             "company_name": create_company_form.company_name,
             "company_description": create_company_form.company_description,
+            "company_visible": create_company_form.company_visible,
             "company_owner_id": user_id
         }
         query = insert(models.Company).values(**payload)

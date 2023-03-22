@@ -228,7 +228,7 @@ async def test_get_users_list(ac: AsyncClient, users_tokens):
     }
     response = await ac.get("/users", headers=headers)
     assert response.status_code == 200
-    assert len(response.json()) == 5
+    assert len(response.json().get("items")) == 5
 
 
 @pytest.mark.asyncio
@@ -331,4 +331,4 @@ async def test_get_users_list_after_delete(ac: AsyncClient, users_tokens):
     }
     response = await ac.get("/users", headers=headers)
     assert response.status_code == 200
-    assert len(response.json()) == 4
+    assert len(response.json().get("items")) == 4

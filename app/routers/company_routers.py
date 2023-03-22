@@ -5,6 +5,7 @@ sys.path.append(os.getcwd())
 from databases import Database
 from app.schemas import company_schemas, user_schemas
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi_pagination import Page, paginate
 from typing import List
 from app.services.crud_user import UserCrud
 from app.services.crud_company import CompanyCrud
@@ -21,10 +22,11 @@ async def get_company(company_id: int, db: Database = Depends(get_sql_db), user:
     return await crud_company.get_company(company_id=company_id)
 
 
-@router.get("/companies", response_model=List[company_schemas.Company])
+@router.get("/companies", response_model=Page[company_schemas.Company])
 async def get_all_companies(db: Database = Depends(get_sql_db), user: user_schemas.User = Depends(get_current_user)) -> List[company_schemas.Company]:
     crud_company = CompanyCrud(db=db)
-    return await crud_company.get_all_companies()
+    companies = await crud_company.get_all_companies()
+    return paginate(companies)
 
 
 @router.post("/company", response_model=company_schemas.Company, status_code=201)

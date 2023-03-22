@@ -72,7 +72,7 @@ async def test_get_all_companies(users_tokens, ac: AsyncClient):
     }
     response = await ac.get("/companies", headers=headers)
     assert response.status_code == 200
-    assert len(response.json()) == 3
+    assert len(response.json().get("items")) == 3
 
 
 @pytest.mark.asyncio
@@ -184,4 +184,4 @@ async def test_get_all_companies_after_not_delete(users_tokens, ac: AsyncClient)
     }
     response = await ac.get("/companies", headers=headers)
     assert response.status_code == 200
-    assert len(response.json()) == 2
+    assert len(response.json().get("items")) == 2

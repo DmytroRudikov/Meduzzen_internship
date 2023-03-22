@@ -1,6 +1,7 @@
 import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_pagination import add_pagination
 import uvicorn
 from dotenv import load_dotenv
 import json
@@ -20,6 +21,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+add_pagination(app)
 
 
 @app.get("/")

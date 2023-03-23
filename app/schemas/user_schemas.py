@@ -10,7 +10,7 @@ class SigninRequest(BaseModel):
     @validator("password")
     def password_not_empty(cls, password):
         if password == "" or password is None:
-            return HTTPException(status_code=422, detail="The password must not be empty")
+            raise HTTPException(status_code=422, detail="The password must not be empty")
         return password
 
 
@@ -26,18 +26,21 @@ class SignupRequest(SigninRequest):
         return password_check
 
 
-class User(BaseModel):
+class UserNoPassword(BaseModel):
     id: int
     first_name: str
     last_name: str
     email: str
-    password: str
     status: str | None = None
     created_on: str
     updated_on: str
 
     class Config:
         orm_mode = True
+
+
+class User(UserNoPassword):
+    password: str
 
 
 class UserUpdate(BaseModel):

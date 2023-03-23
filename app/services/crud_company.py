@@ -24,7 +24,7 @@ class CompanyCrud:
                 raise HTTPException(status_code=404, detail="Company with this id does not exist")
             return company_exists
 
-    async def visibility_check(self, companies: list, user_id: int):
+    async def visibility_check(self, companies: list, user_id: int) -> List[company_schemas.Company]:
         companies_to_return = []
         crud_user = UserCrud(db=self.db)
         for comp in companies:

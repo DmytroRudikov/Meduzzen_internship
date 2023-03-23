@@ -1,5 +1,4 @@
 import os
-
 from schemas import user_schemas
 from db import models
 from core.db_config import get_sql_db

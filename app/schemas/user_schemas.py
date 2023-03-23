@@ -21,7 +21,6 @@ class SignupRequest(SigninRequest):
 
     @validator("password_check")
     def password_match(cls, password_check, values):
-        print(password_check, values)
         if "password" in values and password_check != values["password"]:
             raise ValueError("Passwords do not match")
         return password_check
@@ -42,7 +41,6 @@ class User(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    id: int | None = None
     first_name: str | None = None
     last_name: str | None = None
     status: str | None = None

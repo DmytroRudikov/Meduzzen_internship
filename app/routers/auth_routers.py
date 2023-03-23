@@ -4,7 +4,7 @@ sys.path.append(os.getcwd())
 
 from app.schemas import token_schemas, user_schemas
 from fastapi import APIRouter, Depends
-from app.core.authorisation import Auth
+from app.core.authorisation import Auth, get_current_user
 
 router = APIRouter()
 auth = Auth()
@@ -16,5 +16,5 @@ async def signin_and_get_token(login_form: user_schemas.SigninRequest) -> token_
 
 
 @router.get("/auth/me", response_model=user_schemas.User)
-async def get_current_user(user: user_schemas.User = Depends(auth.get_current_user)) -> user_schemas.User:
-    return await user
+async def get_current_user(user: user_schemas.User = Depends(get_current_user)) -> user_schemas.User:
+    return user

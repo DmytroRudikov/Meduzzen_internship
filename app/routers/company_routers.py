@@ -13,7 +13,6 @@ from app.core.db_config import get_sql_db
 from app.core.authorisation import Auth, get_current_user
 
 router = APIRouter()
-auth = Auth()
 
 
 @router.get("/company/{company_id}", response_model=company_schemas.Company)

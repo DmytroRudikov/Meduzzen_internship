@@ -24,7 +24,7 @@ async def get_current_user(token: str = Depends(oauth_scheme),
     try:
         payload = jwt.decode(token=token, key=auth.SECRET_KEY, algorithms=auth.ALGORITHM)
     except AttributeError:
-        raise HTTPException(status_code=403, detail="No token provided, access forbidden")
+        raise HTTPException(status_code=403, detail="Not authenticated")
     except JWTError:
         payload = VerifyToken(token=token_auth0.credentials).verify_token()
     user_email = payload.get("user_email")

@@ -6,6 +6,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import insert, select, delete, update
 from typing import List
 from app.services.crud_user import UserCrud
+from app.services.crud_member import MemberCrud
 from app.core.db_config import get_sql_db
 
 
@@ -21,7 +22,7 @@ class CompanyCrud:
         elif company_name is None:
             company_exists = await self.db.fetch_one(select(models.Company).filter_by(company_id=company_id))
             if not company_exists:
-                raise HTTPException(status_code=404, detail="Company with this id does not exist")
+                raise HTTPException(status_code=404, detail="Company does not exist")
             return company_exists
 
     async def visibility_check(self, companies: list, user_id: int) -> List[company_schemas.Company]:
@@ -62,6 +63,8 @@ class CompanyCrud:
         query = insert(models.Company).values(**payload)
         await self.db.execute(query=query)
         new_company = await self.db.fetch_one(select(models.Company).filter_by(company_name=payload.get("company_name")))
+        crud_member = MemberCrud(db=self.db)
+        await crud_member.create_member(user_id=user_id, company_id=new_company.company_id)
         return new_company
 
     @staticmethod
@@ -69,7 +72,7 @@ class CompanyCrud:
         updates = {}
         for key in company._mapping.keys():
             if key == "updated_on":
-                updates["updated_on"] = str(datetime.datetime.now().strftime("%Y-%m-%d%H:%M:%S"))
+                updates["updated_on"] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             elif key not in company_upd.dict() or company_upd.dict()[key] is None:
                 continue
             else:

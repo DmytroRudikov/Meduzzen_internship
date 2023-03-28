@@ -11,7 +11,7 @@ class MemberCrud:
     def __init__(self, db: Database):
         self.db = db
 
-    async def member_exists(self, company_member_id: int, company_id: int):
+    async def member_exists(self, company_member_id: int, company_id: int) -> member_schemas.Member:
         member_exists = await self.db.fetch_one(select(models.MemberRecord).filter_by(company_id=company_id, company_member_id=company_member_id))
         if not member_exists:
             raise HTTPException(status_code=404, detail=f"Company member with id {company_member_id} not found")

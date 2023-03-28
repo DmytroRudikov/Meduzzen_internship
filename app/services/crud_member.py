@@ -28,13 +28,23 @@ class MemberCrud:
     async def create_member(self, user_id: int, company_id: int):
         last_company_member_id = await self.check_the_last_company_member_id(company_id=company_id)
         last_company_member_id += 1
-        values = {
-            "user_id": user_id,
-            "company_id": company_id,
-            "created_on": str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-            "updated_on": str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-            "company_member_id": last_company_member_id
-        }
+        if last_company_member_id == 1:
+            values = {
+                "user_id": user_id,
+                "company_id": company_id,
+                "created_on": str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                "updated_on": str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                "company_member_id": last_company_member_id,
+                "role": "owner"
+            }
+        else:
+            values = {
+                "user_id": user_id,
+                "company_id": company_id,
+                "created_on": str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                "updated_on": str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                "company_member_id": last_company_member_id
+            }
         await self.db.execute(insert(models.MemberRecord), values=values)
 
     async def get_member(self, company_id: int, company_member_id: int | None = None, user_id: int | None = None) -> member_schemas.Member:

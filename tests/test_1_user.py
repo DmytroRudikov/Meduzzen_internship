@@ -137,6 +137,33 @@ async def test_create_user_five(ac: AsyncClient):
     assert response.json().get("id") == 5
 
 
+@pytest.mark.asyncio
+async def test_create_user_six(ac: AsyncClient):
+    payload = {
+        "password": "test6",
+        "password_check": "test6",
+        "email": "test6@test.com",
+        "first_name": "test",
+        "last_name": "6",
+    }
+    response = await ac.post("/user", json=payload)
+    assert response.status_code == 200
+    assert response.json().get("id") == 6
+
+
+@pytest.mark.asyncio
+async def test_create_user_seven(ac: AsyncClient):
+    payload = {
+        "password": "test7",
+        "password_check": "test7",
+        "email": "test7@test.com",
+        "first_name": "test",
+        "last_name": "7",
+    }
+    response = await ac.post("/user", json=payload)
+    assert response.status_code == 200
+    assert response.json().get("id") == 7
+
 # =================================
 
 
@@ -178,6 +205,20 @@ async def test_try_login_four(ac: AsyncClient, login_user):
 @pytest.mark.asyncio
 async def test_try_login_five(ac: AsyncClient, login_user):
     response = await login_user("test5@test.com", "test5")
+    assert response.status_code == 200
+    assert response.json().get('token_type') == 'Bearer'
+
+
+@pytest.mark.asyncio
+async def test_try_login_six(ac: AsyncClient, login_user):
+    response = await login_user("test6@test.com", "test6")
+    assert response.status_code == 200
+    assert response.json().get('token_type') == 'Bearer'
+
+
+@pytest.mark.asyncio
+async def test_try_login_seven(ac: AsyncClient, login_user):
+    response = await login_user("test7@test.com", "test7")
     assert response.status_code == 200
     assert response.json().get('token_type') == 'Bearer'
 
@@ -228,7 +269,7 @@ async def test_get_users_list(ac: AsyncClient, users_tokens):
     }
     response = await ac.get("/users", headers=headers)
     assert response.status_code == 200
-    assert len(response.json().get("items")) == 5
+    assert len(response.json().get("items")) == 7
 
 
 @pytest.mark.asyncio
@@ -262,7 +303,7 @@ async def test_bad_get_user_by_id__not_found(ac: AsyncClient, users_tokens):
     headers = {
         "Authorization": f"Bearer {users_tokens['test1@test.com']}",
     }
-    response = await ac.get("/user/6", headers=headers)
+    response = await ac.get("/user/60", headers=headers)
     assert response.status_code == 404
 
 
@@ -331,4 +372,4 @@ async def test_get_users_list_after_delete(ac: AsyncClient, users_tokens):
     }
     response = await ac.get("/users", headers=headers)
     assert response.status_code == 200
-    assert len(response.json().get("items")) == 4
+    assert len(response.json().get("items")) == 6

@@ -314,13 +314,13 @@ async def test_decline_request_success(ac: AsyncClient, users_tokens):
 
 
 @pytest.mark.asyncio
-async def test_members_only_owner(ac: AsyncClient, users_tokens):
+async def test_members_comp_one(ac: AsyncClient, users_tokens):
     headers = {
         "Authorization": f"Bearer {users_tokens['test2@test.com']}",
     }
-    response = await ac.get("/company/4/members", headers=headers)
+    response = await ac.get("/company/1/members", headers=headers)
     assert response.status_code == 200
-    assert len(response.json().get('items')) == 3
+    assert len(response.json().get('items')) == 1
 
 
 @pytest.mark.asyncio
@@ -391,3 +391,48 @@ async def test_members_after_leave(ac: AsyncClient, users_tokens):
     response = await ac.get("/company/4/members", headers=headers)
     assert response.status_code == 200
     assert len(response.json().get('items')) == 1
+
+
+# ===========
+
+
+@pytest.mark.asyncio
+async def test_send_request_five_success(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test6@test.com']}",
+    }
+    payload = {
+        "to_company_id": 4,
+        "request_message": "string"
+    }
+    response = await ac.post("/request", json=payload, headers=headers)
+    assert response.status_code == 200
+    assert response.json().get('detail') == "success"
+
+
+@pytest.mark.asyncio
+async def test_requests_company_two_success(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}",
+    }
+    response = await ac.get("/request/company/4", headers=headers)
+    assert response.status_code == 200
+    assert len(response.json().get('items')) == 2
+
+
+@pytest.mark.asyncio
+async def test_accept_requests_four(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}",
+    }
+    response = await ac.get("/request/4/accept", headers=headers)
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_accept_requests_five(ac: AsyncClient, users_tokens):
+    headers = {
+        "Authorization": f"Bearer {users_tokens['test2@test.com']}",
+    }
+    response = await ac.get("/request/5/accept", headers=headers)
+    assert response.status_code == 200

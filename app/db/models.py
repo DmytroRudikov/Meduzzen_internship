@@ -87,7 +87,7 @@ class Quiz(Base):
     quiz_record_id = Column(Integer, primary_key=True, index=True)
     company_id = Column(Integer, ForeignKey("companies.company_id", ondelete="CASCADE"), nullable=False)
     quiz_id_in_company = Column(Integer, nullable=False)
-    quiz_name = Column(String, nullable=False, unique=True)
+    quiz_name = Column(String, nullable=False)
     description = Column(String, nullable=False)
     times_quiz_passed_per_day = Column(Integer)
     company_relationship = relationship("Company", back_populates="quiz_relationship")
@@ -98,7 +98,7 @@ class Question(Base):
     __tablename__ = "questions"
 
     question_record_id = Column(Integer, primary_key=True, index=True)
-    quiz_id = Column(Integer, ForeignKey("quizzes.quiz_id", ondelete="CASCADE"), nullable=False)
+    quiz_record_id = Column(Integer, ForeignKey("quizzes.quiz_record_id", ondelete="CASCADE"), nullable=False)
     question_id_in_quiz = Column(Integer, nullable=False)
     question = Column(String, nullable=False)
     answer_options = Column(ARRAY(String), nullable=False)

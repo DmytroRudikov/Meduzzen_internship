@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, ARRAY
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
@@ -36,6 +36,7 @@ class Company(Base):
     member_relationship = relationship("MemberRecord", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
     request_relationship = relationship("Request", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
     invite_relationship = relationship("Invite", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
+    quiz_relationship = relationship("Quiz", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
 
 
 class MemberRecord(Base):
@@ -78,3 +79,27 @@ class Invite(Base):
     status = Column(String)
     user_relationship = relationship("User", back_populates="invite_relationship")
     company_relationship = relationship("Company", back_populates="invite_relationship")
+
+
+class Quiz(Base):
+    __tablename__ = "quizzes"
+
+    quiz_record_id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, ForeignKey("companies.company_id", ondelete="CASCADE"), nullable=False)
+    quiz_id_in_company = Column(Integer, nullable=False)
+    quiz_name = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    times_quiz_passed_per_day = Column(Integer)
+    company_relationship = relationship("Company", back_populates="quiz_relationship")
+    questions_relationship = relationship("Question", backref="quiz_relationship", cascade="all, delete", passive_deletes=True)
+
+
+class Question(Base):
+    __tablename__ = "questions"
+
+    question_record_id = Column(Integer, primary_key=True, index=True)
+    quiz_record_id = Column(Integer, ForeignKey("quizzes.quiz_record_id", ondelete="CASCADE"), nullable=False)
+    question_id_in_quiz = Column(Integer, nullable=False)
+    question = Column(String, nullable=False)
+    answer_options = Column(ARRAY(String), nullable=False)
+    correct_answer = Column(String, nullable=False)

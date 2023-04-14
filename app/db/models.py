@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, ARRAY
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, ARRAY, Float
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
@@ -20,6 +20,7 @@ class User(Base):
     member_relationship = relationship("MemberRecord", back_populates="user_relationship", cascade="all, delete", passive_deletes=True)
     request_relationship = relationship("Request", back_populates="user_relationship", cascade="all, delete", passive_deletes=True)
     invite_relationship = relationship("Invite", back_populates="user_relationship", cascade="all, delete", passive_deletes=True)
+    results_relationship = relationship("QuizResults", back_populates="user_relationship", cascade="all, delete", passive_deletes=True)
 
 
 class Company(Base):
@@ -37,6 +38,7 @@ class Company(Base):
     request_relationship = relationship("Request", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
     invite_relationship = relationship("Invite", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
     quiz_relationship = relationship("Quiz", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
+    results_relationship = relationship("QuizResults", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
 
 
 class MemberRecord(Base):
@@ -92,6 +94,7 @@ class Quiz(Base):
     times_quiz_passed_per_day = Column(Integer)
     company_relationship = relationship("Company", back_populates="quiz_relationship")
     questions_relationship = relationship("Question", backref="quiz_relationship", cascade="all, delete", passive_deletes=True)
+    results_relationship = relationship("QuizResults", backref="quiz_relationship", cascade="all, delete", passive_deletes=True)
 
 
 class Question(Base):
@@ -103,3 +106,18 @@ class Question(Base):
     question = Column(String, nullable=False)
     answer_options = Column(ARRAY(String), nullable=False)
     correct_answer = Column(String, nullable=False)
+
+
+class QuizResults(Base):
+    __tablename__ = "quiz_results"
+
+    results_id = Column(Integer, primary_key=True, index=True)
+    pass_date = Column(String, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    company_id = Column(Integer, ForeignKey("companies.company_id", ondelete="CASCADE"), nullable=False)
+    quiz_record_id = Column(Integer, ForeignKey("quizzes.quiz_record_id", ondelete="CASCADE"), nullable=False)
+    average_result = Column(Float, nullable=False)
+    number_of_questions = Column(Integer, nullable=False)
+    correct_answers = Column(Integer, nullable=False)
+    user_relationship = relationship("User", back_populates="results_relationship")
+    company_relationship = relationship("Company", back_populates="results_relationship")

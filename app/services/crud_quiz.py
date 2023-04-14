@@ -5,7 +5,6 @@ import datetime
 from fastapi import HTTPException, status
 from sqlalchemy import insert, select, delete, update, case
 from typing import List, Dict
-from services.crud_company import CompanyCrud
 
 
 class QuizCrud:

@@ -2,7 +2,6 @@ import os
 import databases
 import asyncpg
 import aioredis
-import redis
 from dotenv import load_dotenv
 from pydantic import BaseSettings
 
@@ -19,7 +18,7 @@ settings = Settings()
 
 load_dotenv()
 
-r = redis.from_url(os.getenv("REDIS_URI"))
+r = aioredis.from_url(os.getenv("REDIS_URI"))
 
 if settings.TESTING:
     database = databases.Database(f"postgresql+asyncpg://postgres:passtest@localhost:5433/fastapipet", force_rollback=True)

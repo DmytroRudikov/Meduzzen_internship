@@ -10,7 +10,6 @@ router = APIRouter()
 
 @router.on_event("startup")
 async def connect_to_db():
-    get_redis_db()
     await get_sql_db().connect()
 
 

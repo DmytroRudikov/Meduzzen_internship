@@ -12,12 +12,29 @@ services:
       - postgres
       - redis
   redis:
-    image: "redis:alpine"
+    image: "redis:latest"
+    container_name: redis_db
     restart: always
     env_file:
       - .env
     ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
+      - ${REDIS_PORT_IN}:${REDIS_PORT_OUT}
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis_ui
+    env_file:
+      - .env
+    ports:
+      - ${REDIS_COMMANDER_PORT}:${REDIS_COMMANDER_PORT}
+    environment:
+      - REDIS_HOSTS=local:redis:${REDIS_PORT}
+      - HTTP_USER=${HTTP_USER}
+      - HTTP_PASSWORD=${HTTP_PASSWORD}
+    depends_on:
+      - redis
   postgres:
     image: postgres:15
     restart: always
@@ -52,3 +69,5 @@ services:
     depends_on:
       - postgres
 
+volumes:
+  redis-data:

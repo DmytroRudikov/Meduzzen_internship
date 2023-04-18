@@ -114,6 +114,10 @@ class ResultsCrud:
         results = await self.db.fetch_all(select(models.QuizResults).filter_by(user_id=user_id))
         return results
 
+    async def redis_get_all_user_results(self, user_id: int) -> List[results_schemas.Results]:
+        results = await self.db.fetch_all(select(models.QuizResults).filter_by(user_id=user_id))
+        return results
+
     async def get_all_company_member_results(self, user_id: int, company_id: int) -> List[results_schemas.Results]:
         results = await self.db.fetch_all(select(models.QuizResults).filter_by(user_id=user_id, company_id=company_id))
         return results

@@ -7,7 +7,7 @@ from sqlalchemy import insert, select, func
 from typing import List, Dict
 from services.crud_quiz import QuizCrud
 import json
-from core.db_config import get_redis_db
+from app.core.db_config import get_redis_db
 import os
 from dotenv import load_dotenv
 
@@ -59,7 +59,7 @@ class ResultsCrud:
                         "question_id_in_quiz": q_num,
                         "question": question.question,
                         "answer_from_participant": answer,
-                        "correct_answer": question.correct_answer
+                        "is_answer_correct": "correct" if question.correct_answer == answer else "incorrect"
                     }
                     serialised_data = json.dumps(to_store_in_redis)
                     redis_list.append(serialised_data)
@@ -98,8 +98,8 @@ class ResultsCrud:
     async def record_redis_data(self, redis_values: dict):
         deserialised = json.loads(redis_values.get("values")[0])
         key = f"user_id:{deserialised.get('user_id')}:company_id:{deserialised.get('company_id')}:quiz_id_in_company:{deserialised.get('quiz_id_in_company')}:pass_date:{redis_values.get('pass_date')}"
-        redis = get_redis_db()
-        await redis.set(name=key, value=";".join(redis_values.get("values")), ex=self.expire_seconds)
+        redis_db = get_redis_db()
+        await redis_db.set(name=key, value=";".join(redis_values.get("values")), ex=self.expire_seconds)
 
     async def record_results(self, answers: results_schemas.AnswerQuiz, company_id: int, quiz_id_in_company: int, user_id: int) -> status.HTTP_200_OK:
         crud_quiz = QuizCrud(db=self.db)

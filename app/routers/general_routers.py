@@ -1,7 +1,3 @@
-import sys
-import os
-sys.path.append(os.getcwd())
-
 from fastapi import APIRouter
 from app.core.db_config import get_redis_db, get_sql_db
 

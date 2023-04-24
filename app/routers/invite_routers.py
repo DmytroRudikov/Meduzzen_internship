@@ -1,7 +1,3 @@
-import sys
-import os
-sys.path.append(os.getcwd())
-
 from databases import Database
 from app.schemas import invite_schemas, user_schemas
 from fastapi import APIRouter, Depends, HTTPException, status

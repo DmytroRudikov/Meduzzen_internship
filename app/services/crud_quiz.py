@@ -5,6 +5,7 @@ import datetime
 from fastapi import HTTPException, status
 from sqlalchemy import insert, select, delete, update, case
 from typing import List, Dict
+from app.services.crud_notification import NotificationCrud
 
 
 class QuizCrud:
@@ -61,11 +62,14 @@ class QuizCrud:
             "company_id": company_id,
             "description": create_quiz_form.description,
             "quiz_id_in_company": last_quiz_id_in_company,
+            "quiz_to_be_passed_in_hours": create_quiz_form.quiz_to_be_passed_in_hours
         }
         await self.db.execute(insert(models.Quiz), values=quiz_values)
         quiz_record = await self.db.fetch_one(select(models.Quiz).filter_by(company_id=company_id, quiz_id_in_company=last_quiz_id_in_company))
         question_values = await self.create_questions(quiz_record_id=quiz_record.quiz_record_id, create_quiz_form=create_quiz_form)
         await self.db.execute_many(query=insert(models.Question), values=question_values)
+        crud_notification = NotificationCrud(db=self.db)
+        await crud_notification.create_notification(company_id=company_id, quiz_record_id=quiz_record.quiz_record_id)
         return HTTPException(status_code=200, detail="success")
 
     async def get_quiz(self, company_id: int, quiz_id_in_company: int) -> quiz_schemas.Quiz:

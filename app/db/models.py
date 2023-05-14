@@ -21,6 +21,7 @@ class User(Base):
     request_relationship = relationship("Request", back_populates="user_relationship", cascade="all, delete", passive_deletes=True)
     invite_relationship = relationship("Invite", back_populates="user_relationship", cascade="all, delete", passive_deletes=True)
     results_relationship = relationship("QuizResults", back_populates="user_relationship", cascade="all, delete", passive_deletes=True)
+    notification_relationship = relationship("Notification", back_populates="user_relationship", cascade="all, delete", passive_deletes=True)
 
 
 class Company(Base):
@@ -39,6 +40,7 @@ class Company(Base):
     invite_relationship = relationship("Invite", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
     quiz_relationship = relationship("Quiz", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
     results_relationship = relationship("QuizResults", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
+    notification_relationship = relationship("Notification", back_populates="company_relationship", cascade="all, delete", passive_deletes=True)
 
 
 class MemberRecord(Base):
@@ -91,10 +93,11 @@ class Quiz(Base):
     quiz_id_in_company = Column(Integer, nullable=False)
     quiz_name = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    times_quiz_passed_per_day = Column(Integer)
+    quiz_to_be_passed_in_hours = Column(Integer)
     company_relationship = relationship("Company", back_populates="quiz_relationship")
     questions_relationship = relationship("Question", backref="quiz_relationship", cascade="all, delete", passive_deletes=True)
     results_relationship = relationship("QuizResults", backref="quiz_relationship", cascade="all, delete", passive_deletes=True)
+    notification_relationship = relationship("Notification", backref="quiz_relationship", cascade="all, delete", passive_deletes=True)
 
 
 class Question(Base):
@@ -121,3 +124,17 @@ class QuizResults(Base):
     correct_answers = Column(Integer, nullable=False)
     user_relationship = relationship("User", back_populates="results_relationship")
     company_relationship = relationship("Company", back_populates="results_relationship")
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    notification_id = Column(Integer, primary_key=True, index=True)
+    date_time = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    text = Column(String, nullable=False)
+    company_id = Column(Integer, ForeignKey("companies.company_id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    quiz_record_id = Column(Integer, ForeignKey("quizzes.quiz_record_id", ondelete="CASCADE"), nullable=False)
+    user_relationship = relationship("User", back_populates="notification_relationship")
+    company_relationship = relationship("Company", back_populates="notification_relationship")

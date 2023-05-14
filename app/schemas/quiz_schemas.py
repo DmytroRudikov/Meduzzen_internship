@@ -8,11 +8,13 @@ class CreateQuiz(BaseModel):
     questions: dict
     answer_options: list
     correct_answer: list
+    quiz_to_be_passed_in_hours: int | None = None
 
 
 class UpdateQuiz(BaseModel):
     quiz_name: str | None = None
     description: str | None = None
+    quiz_to_be_passed_in_hours: int | None = None
 
 
 class DeleteQuestions(BaseModel):
@@ -31,7 +33,7 @@ class Quiz(BaseModel):
     quiz_id_in_company: int
     quiz_name: str
     description: str
-    times_quiz_passed_per_day: int | None = None
+    quiz_to_be_passed_in_hours: int | None = None
 
 
 class Questions(BaseModel):

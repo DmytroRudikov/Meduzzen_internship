@@ -1,18 +1,10 @@
 from app.schemas import analytics_schemas
 from app.db import models
 from databases import Database
-import datetime
 from fastapi import HTTPException, status, Depends
-from sqlalchemy import insert, select, func, DateTime, cast, desc, alias
-from typing import List, Dict
-from app.services.crud_quiz import QuizCrud
+from sqlalchemy import select, func, DateTime, cast, desc
+from typing import List
 from app.services.crud_results import ResultsCrud
-import json
-from app.core.db_config import get_redis_db
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 class AnalyticsCrud:
